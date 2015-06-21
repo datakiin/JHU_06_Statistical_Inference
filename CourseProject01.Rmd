@@ -7,16 +7,47 @@ output: html_document
 
 This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+##Overview
+This report is part submission for the class project in Statistical Inference - a course in the John Hopkins University Data Science specialization on Coursera.
+
+As per the project webpage, this report investigates the exponential distribution in R and compare it with the Central Limit Theorem. The project requirements are to illustrate via simulation and associated explanatory text the properties of the distribution of the mean of 40 exponentials. The project report should:
+
+1. Show the sample mean and compare it to the theoretical mean of the         distribution.
+2. Show how variable the sample is (via variance) and compare it to the       theoretical variance of the distribution.
+3. Show that the distribution is approximately normal.
+
+##Building the Simulation
+Fortunately, the simulation can be easily run in R using the rexp(n,l) function, where n is the number of exponentials and l or lambda, is a constant set to 0.2 for our report. The following R code is used:
+
 
 ```{r}
-summary(cars)
+# Set random seed and initialize variables
+set.seed(123456)
+l <- 0.2     # lambda
+n <- 40      # number of exponentials
+s <- 1000    # number of simulations
+
+# Create a data frame for the simulation size
+df <- data.frame(mean=numeric(s))
+
+# Iterate lambda to the number of simulations
+for (i in 1:s) {
+        sim1 <- rexp(n,l)
+        df[i,1] <- mean(sim1)
+}
 ```
 
-You can also embed plots, for example:
+##Comparing the Sample Mean with the Theoretical Mean
 
-```{r, echo=FALSE}
-plot(cars)
+We can now compare the sample mean from our simulation with the theoretical mean given by 1/lambda. For the theoretical mean: 
+```{r}
+tm <- 1/l       # theoretical mean
+format(round(tm, 2), nsmall=2)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+The sample mean can be defined as the average of the iterated values:
+```{r}
+am <- mean(df$mean)
+format(round(am, 2), nsmall=2)
+```
+
