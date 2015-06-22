@@ -2,26 +2,21 @@
 title: "JHU 06 Course Project part 1 - Central Limit Theorem"
 author: "Kamran Haroon"
 date: "June 21, 2015"
-output: pdf_document
+output: word_document
 ---
 
 This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
 
-
 ###Overview
 This report is part submission for the class project in Statistical Inference - a course in the John Hopkins University Data Science specialization on Coursera.
-
 As per the project webpage, this report investigates the exponential distribution in R and compare it with the Central Limit Theorem. The project requirements are to illustrate via simulation and associated explanatory text the properties of the distribution of the mean of 40 exponentials. The project report should:
 
-1. Show the sample mean and compare it to the theoretical mean of the         distribution.
-2. Show how variable the sample is (via variance) and compare it to the       theoretical variance of the distribution.
+1. Show the sample mean and compare it to the theoretical mean of the                  distribution.
+2. Show how variable the sample is (via variance) and compare it to the                theoretical variance of the distribution.
 3. Show that the distribution is approximately normal.
-
 
 ###Building the Simulation
 Fortunately, the simulation can be easily run in R using the rexp(n,l) function, where n is the number of exponentials and l or lambda, is a constant set to 0.2 for our report. The following R code is used:
-
-
 ```{r}
 # Set random seed and initialize variables
 set.seed(123456)
@@ -38,7 +33,6 @@ for (i in 1:s) {
         df[i,1] <- mean(sim1)
 }
 ```
-
 
 ###Comparing the sample mean and theoretical mean of the distribution
 After running our simulation, we can compare the sample mean with the theoretical mean. The sample mean can be defined as the average of the iterated values:
@@ -62,7 +56,6 @@ hist(df$mean, probability = T, main = paste("Theoretical Mean = ", format(round(
 abline(v = tm, col = 'red', lwd = 5)
 ```
 
-
 ###Comparing sample variance and theoretical variance of the distribution
 We now proceed to compare variance of the sample and theoretical variance of the distribution. The var function in R is used to determine the actual variance of the observations. The sample variance R code is:
 ```{r}
@@ -78,7 +71,6 @@ format(round(tv, 3), nsmall = 3)
 
 We observe that the sample and theoretical variances are quite close. This is good as the sample data is distributed as expected.
 
-
 ###Plotting the distribution curves
 Finally, we overlay the actual and normal distribution curves over our sample observation means. It can be clearly observed that our sample set follows a normal distribution.
 ```{r}
@@ -89,5 +81,3 @@ lines(density(scale(df$mean)), col = 'blue')            # actual distribution cu
 legend(2, 0.4, c('Normal', 'Actual'), cex = 0.8, col = c('red', 'blue'), lty = 1)
 ```
 
-###Conclusions
-After running our simulation and the calculations required for the project, we can conclude that our sample set conforms to the Central Limit Theorem and has a normal exponential distribution.

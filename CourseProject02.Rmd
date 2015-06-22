@@ -1,0 +1,96 @@
+---
+title: "JHU 06 Course Project part 2 - ToothGrowth R dataset"
+author: "Kamran Haroon"
+date: "June 22, 2015"
+output: word_document
+---
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+###Overview
+This report is part submission for the class project in Statistical Inference - a course in the John Hopkins University Data Science specialization on Coursera.
+As per the project webpage, we are required to:
+
+1. Load the ToothGrowth data and perform some basic exploratory data analyses
+2. Provide a basic summary of the data.
+3. Use confidence intervals and/or hypothesis tests to compare tooth growth by supp and dose. (Only use the techniques from class, even if there's other approaches worth considering)
+4. State your conclusions and the assumptions needed for your conclusions.
+
+The data is the result of measuring the affect of different dosage amounts of Vitamin C on the length of odontoblasts (teeth) of ten guinea pigs. There are two supplement types of Vitamin C tested, Orange Juice and Ascorbic Acid, and they are given in three three different milligram dosage amount, 0.5, 1.0, and 2.0.
+```{r}
+suppressWarnings(library(ggplot2))
+suppressMessages(library(data.table)) 
+library(grid)
+```
+
+###Data Cleansing
+From source, load the ToothGrowth data into a data.table object. Rename the columns and write a join key. To make categorizing a little more simple, we add an additional column for Dosage by converting the Dose variable into factors.
+```{r}
+# Read in the data file and rename the columns
+data1 <- data.table(ToothGrowth)
+setnames(data1, c('len', 'supp', 'dose'), c('Length', 'Supplement', 'Dose'))
+
+# Add 'Dosage'and write the join key for factors
+data1 <- data1[,Dosage:=sapply(as.character(data1$Dose), function(x) as.factor(switch(x, '0.5'='SM', '1'='MD', '2'='LG')))]
+setkey(data1, Supplement, Dosage)
+head(data1, 1)
+```
+
+###Exploratory Analysis
+For a simple exploration of the date to understand the content and the structure of the data.table.
+```{r}
+summary(data1)
+```
+
+```{r}
+str(data1)
+```
+
+Now we plot Length against both Dosage and Supplement. We observe that larger the Dosage, the longer the Length. However, we are not yet certain whether Orange Juice (OJ) or Ascorbic Acid(VC) doses result in greater teeth length.
+```{r}
+# Plot 1 
+g1 <- ggplot(data1, aes(x=Dosage, y=Length))
+g1 <- g1+geom_point(aes(color=Supplement), size=4)
+print(g1)
+
+# Plot 2
+g2 <- ggplot(data1, aes(x=Supplement,y=Length))
+g2 <- g2+geom_point(aes(color=Dosage),size=4)
+print(g2)
+```
+
+###Confidence Interval Testing
+
+In order to understand how Vitamin C affects tooth growth, we will conduct the following confidence interval tests. We subset data1 and use the t.test R function to determine the confidence interval, subset means, and p-value for each scenario.
+
+###Compare Dosage Alone
+
+```{r}
+t1 <- subset(data1, Dosage=='SM')$Length
+t2 <- subset(data1, Dosage=='MD')$Length
+t <- t.test(t1, t2, paired=FALSE, var.equal=FALSE)
+t$conf.int[1:2]
+```
+
+If we increase the Vitamin C dose from 0.5 to 1.0 milligrams, the confidence interval does not contain zero, so we can conclude that dose increase does increase tooth length.
+```{r}
+t1 <- subset(data1,Dosage=='MD')$Length
+t2 <- subset(data1,Dosage=='LG')$Length
+t <- t.test(t1,t2,paired=FALSE,var.equal=FALSE)
+t$conf.int[1:2]
+```
+
+Now if we increase the Vitamin C dose from 1.0 to 2.0 milligrams, the confidence interval again does not contain zero, so we can conclude that dose increase does increase tooth length.
+
+In both of these scenarios, an increased dose amount leads to an increased tooth length.
+
+###Compare Supplement Alone
+```{r}
+t1<-subset(data1,Supplement=='VC')$Length
+t2<-subset(data1,Supplement=='OJ')$Length
+t<-t.test(t1,t2,paired=FALSE,var.equal=FALSE)
+t$p.value
+t$conf.int[1:2]
+```     
+
+In this single comparison, the p-value is 0.061 and the confidence interval contains zero so we can conclude that the choice of Vitamin C supplement alone does not affect tooth growth.
